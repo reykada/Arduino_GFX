@@ -2452,6 +2452,169 @@ static const uint8_t HD458002C40_init_operations[] = {
     WRITE_C8_D8, 0x3A, 0x66,
     WRITE_COMMAND_8, 0x29};
 
+static const uint8_t st7701_ER_TFT2_99_1_init_operations[] = {
+    BEGIN_WRITE,
+
+    // Unlock extended command set (Page 0x13)
+    WRITE_COMMAND_8, 0xFF,
+    WRITE_BYTES, 5, 0x77, 0x01, 0x00, 0x00, 0x13,
+
+    // Set gate EQ control
+    WRITE_C8_D8, 0xEF, 0x08,
+
+    // Unlock extended command set (Page 0x10)
+    WRITE_COMMAND_8, 0xFF,
+    WRITE_BYTES, 5, 0x77, 0x01, 0x00, 0x00, 0x10,
+
+    // LNESET (C0h/C000h): Display Line Setting
+    WRITE_C8_D16, 0xC0, 0x63, 0x00, // Line resolution = 800
+
+    // PORCTRL (C1h/C100h): Porch Control
+    WRITE_C8_D16, 0xC1, 0x0D, 0x0D, // Back/Front Porch Vertical line setting for display = 13
+
+    // INVSET (C2h/C200h): Inversion selection & Frame Rate Control
+    WRITE_C8_D16, 0xC2, 0x37, 0x03, // Inversion Selection = Column, Minimum number of pclk in each line = 560
+
+    // RGBCTRL (C3h/C300h): RGB control
+    WRITE_COMMAND_8, 0xC3,
+    WRITE_BYTES, 3, 0x80, 0x10, 0x15,
+    // RGB HV mode
+    // Signal polarity of VSYNC/HSYNC pin: active low
+    // Signal polarity of DOTCLK pin - The data is input on the positive edge of DOTCLK
+    // Signal polarity of ENABLE pin - The data DB23-0 is written when ENABLE = “1”. Disable data write operation when ENABLE = “0”.
+    // RGB interface Hsync back porch setting for HV mode: 16
+    // RGB interface Vsync back porch setting for HV mode: 21
+
+    // PVGAMCTRL (B0h/B000h): Positive Voltage Gamma Control
+    WRITE_COMMAND_8, 0xB0,
+    WRITE_BYTES, 16, 
+    0x00, 0x0B, 0x12, 0x0E, 
+    0x11, 0x06, 0x02, 0x08, 
+    0x08, 0x1F, 0x06, 0x14, 
+    0x12, 0x29, 0x31, 0x1F,
+
+    // NVGAMCTRL (B1h/B100h): Negative Voltage Gamma Control
+    WRITE_COMMAND_8, 0xB1,
+    WRITE_BYTES, 16, 
+    0x00, 0x0C, 0x13, 0x0C, 
+    0x10, 0x06, 0x01, 0x07, 
+    0x06, 0x1F, 0x03, 0x12, 
+    0x10, 0x29, 0x32, 0x1F,
+
+    // MADCTL(36h/3600h): Display data access control
+    WRITE_COMMAND_8, 0x36,
+    WRITE_BYTES, 2, 0x00, 0x00, // GET Scan direction selection: Get normal scan, BGR: BGR=0 -> RGB
+
+    // Unlock extended command set (Page 0x11)
+    WRITE_COMMAND_8, 0xFF,
+    WRITE_BYTES, 5, 0x77, 0x01, 0x00, 0x00, 0x11,
+
+    // Adjust panel driving characteristics
+    WRITE_C8_D8, 0xB0, 0x65, // VRHS (B0h/B000h):Vop Amplitude setting
+    WRITE_C8_D8, 0xB1, 0x5A, // VCOMS (B1h/B100h):VCOM amplitude setting
+    WRITE_C8_D8, 0xB2, 0x87, // VGHSS (B2h/B200h):VGH Voltage setting
+    WRITE_C8_D8, 0xB3, 0x80, // TESTCMD (B3h/B300h):TEST Command Setting
+
+    WRITE_C8_D8, 0xB5, 0x46, // VGLS (B5h/B500h):VGL Voltage settin
+
+    WRITE_C8_D8, 0xB7, 0x85, // PWCTRL1 (B7h/B700h):Power Control 1
+    WRITE_C8_D8, 0xB8, 0x31, // PWCTRL2 (B8h/B800h):Power Control 2
+
+    WRITE_C8_D8, 0xC1, 0x78, // SPD1 (C1h/C100h): Source pre_drive timing set1
+    WRITE_C8_D8, 0xC2, 0x78, // SPD2 (C2h/C200h):Source EQ2 Setting
+
+    // Set timing for panel driving
+    WRITE_COMMAND_8, 0xE0,
+    WRITE_BYTES, 3, 0x00, 0x29, 0x02, // Adjust panel timing
+
+    // Set brightness control
+    WRITE_COMMAND_8, 0xE1,
+    WRITE_BYTES, 11,
+    0x08, 0xAE, 0x00, 0x00, 
+    0x07, 0xAE, 0x00, 0x00, 
+    0x00, 0x43, 0x43,
+
+    // Set panel refresh rates
+    WRITE_COMMAND_8, 0xE2,
+    WRITE_BYTES, 13,
+    0x30, 0x30, 0x40, 0x40, 
+    0x2D, 0xAE, 0x00, 0x00, 
+    0x2C, 0xAE, 0x00, 0x00, 
+    0x00,
+
+    // Adjust panel drive voltages
+    WRITE_COMMAND_8, 0xE3,
+    WRITE_BYTES, 4, 0x00, 0x00, 0x33, 0x33,
+
+    WRITE_COMMAND_8, 0xE4,
+    WRITE_BYTES, 2, 0x44, 0x44,
+
+    // Adjust timing and drive strength
+    WRITE_COMMAND_8, 0xE5,
+    WRITE_BYTES, 16,
+    0x0A, 0x30, 0x0E, 0xAE,
+    0x0C, 0x32, 0x0E, 0xAE,
+    0x0E, 0x34, 0x0E, 0xAE,
+    0x10, 0x36, 0x0E, 0xAE,
+
+    WRITE_COMMAND_8, 0xE6,
+    WRITE_BYTES, 4, 0x00, 0x00, 0x33, 0x33,
+
+    WRITE_COMMAND_8, 0xE7,
+    WRITE_BYTES, 2, 0x44, 0x44,
+
+    WRITE_COMMAND_8, 0xE8,
+    WRITE_BYTES, 16,
+    0x09, 0x2F, 0x0E, 0xAE,
+    0x0B, 0x31, 0x0E, 0xAE,
+    0x0D, 0x33, 0x0E, 0xAE,
+    0x0F, 0x35, 0x0E, 0xAE,
+
+    // Enable internal oscillation and set clock frequencies
+    WRITE_COMMAND_8, 0xEB,
+    WRITE_BYTES, 7, 
+    0x00, 0x01, 0xE4, 0xE4, 
+    0x99, 0x33, 0x40,
+
+    // Set panel resolution and other settings
+    WRITE_COMMAND_8, 0xEC,
+    WRITE_BYTES, 2, 0x3D, 0x00,
+
+    // Set power control parameters
+    WRITE_COMMAND_8, 0xED,
+    WRITE_BYTES, 16,
+    0x20, 0x76, 0x54, 0x89,
+    0xBA, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xAB,
+    0x98, 0x45, 0x67, 0x02,
+
+    // COLMOD (3Ah/3A00h): Interface Pixel Format
+    WRITE_COMMAND_8, 0x3A,
+    WRITE_BYTES, 1, 0x66, // Pixel Format for RGB Interface: 18-bit/pixel (RGB666)
+    // WRITE_BYTES, 1, 0x55, // Pixel Format for RGB Interface: 16-bit/pixel (RGB565)
+
+    // MADCTL(36h/3600h): Display data access control
+    WRITE_COMMAND_8, 0x36,
+    WRITE_BYTES, 1, 0x00, // GET Scan direction selection: Get normal scan, BGR: BGR=0 -> RGB
+
+    // Exit sleep mode
+    WRITE_COMMAND_8, 0x11,
+    END_WRITE,
+    DELAY, 120, // Wait for 120 ms
+
+    // Turn on the display
+    BEGIN_WRITE,
+    WRITE_COMMAND_8, 0x29,
+    END_WRITE,
+    DELAY, 20, // Wait for 20 ms
+
+    // Disable tearing effect line
+    BEGIN_WRITE,
+    WRITE_COMMAND_8, 0x35,
+    WRITE_BYTES, 1, 0x00, // The Tearing Effect Output line consists of V-Blanking information only
+
+    END_WRITE};
+
 class Arduino_RGB_Display : public Arduino_GFX
 {
 public:
